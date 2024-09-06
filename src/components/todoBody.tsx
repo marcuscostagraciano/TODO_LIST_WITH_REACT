@@ -1,21 +1,26 @@
-import { v4 as uuidv4 } from "uuid";
 import { BaseSyntheticEvent, useEffect, useState } from "react";
 
 import Inputs from "./Inputs";
 import TODOListing from "./List/TODO";
 import { Task } from "../interfaces";
+import { TodoService } from "../services";
 
 const TODOBody = () => {
-  const [taskList, setTaskList] = useState(OGTaskList);
-  // const [taskList, setTaskList] = useState([]);
+  const [taskList, setTaskList] = useState<Task[]>([]);
+  const [task, setTask] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost/todo_list_api/")
-      .then((res) => res.json())
-      .then((a) => setTaskList(a));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const TodoListFromApi: Task[] = await TodoService.getTodoList();
+        setTaskList(TodoListFromApi);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const [task, setTask] = useState("");
+    fetchData();
+  }, []);
 
   const handleOnChange = (e: BaseSyntheticEvent) => {
     // Da própria documentação
@@ -23,31 +28,41 @@ const TODOBody = () => {
     setTask(e.target.value);
   };
 
-  const handleButtonSubmit = (e: BaseSyntheticEvent) => {
+  const handleButtonSubmit = async (e: BaseSyntheticEvent) => {
     e.preventDefault();
 
     if (task) {
-      setTaskList([
-        ...taskList,
-        {
-          id: uuidv4(),
-          task_name: task,
-          isDone: false,
-        },
-      ]);
-      setTask("");
+      try {
+        const newTask: Task = await TodoService.postTodo(task);
+        setTaskList([
+          ...taskList,
+          {
+            ...newTask,
+          },
+        ]);
+        setTask("");
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
-  const handleTodoToggle = (id: string) => {
-    setTaskList(
-      taskList.map((task) =>
+  const handleTodoToggle = async (id: number) => {
+    try {
+      const updatedTaskList = taskList.map((task) =>
         task.id === id ? { ...task, isDone: !task.isDone } : task
-      )
-    );
+      );
+      const updatedTask = updatedTaskList.find((task) => task.id === id);
+
+      await TodoService.patchTodo(updatedTask!.id, updatedTask!.isDone);
+      setTaskList(updatedTaskList);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleTodoDeleteTask = (id: string) => {
+  const handleTodoDeleteTask = async (id: number) => {
+    await TodoService.deleteTodo(id);
     setTaskList(taskList.filter((task) => task.id !== id));
   };
 
@@ -66,38 +81,5 @@ const TODOBody = () => {
     </>
   );
 };
-
-let OGTaskList: Task[] = [
-  {
-    id: uuidv4(),
-    task_name: "Start React",
-    isDone: true,
-  },
-  {
-    id: uuidv4(),
-    task_name: "Make a TODO List",
-    isDone: false,
-  },
-  {
-    id: uuidv4(),
-    task_name: "Give up",
-    isDone: false,
-  },
-  {
-    id: uuidv4(),
-    task_name: 'Use the "useEffect()"',
-    isDone: false,
-  },
-  {
-    id: uuidv4(),
-    task_name: "Learn tax evasion (/s)",
-    isDone: false,
-  },
-  {
-    id: uuidv4(),
-    task_name: "Create a backlog",
-    isDone: false,
-  },
-];
 
 export default TODOBody;
