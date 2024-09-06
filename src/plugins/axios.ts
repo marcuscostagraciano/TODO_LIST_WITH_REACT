@@ -1,3 +1,7 @@
-import axios from "axios";
+import axios from 'axios'
 
-axios.baseURL = 'localhost:'
+const api = axios.create({
+    baseURL: 'http://localhost/todo_list_api/'
+}) 
+
+export default api
