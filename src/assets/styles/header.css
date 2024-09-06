@@ -1,0 +1,24 @@
+/* .project-header::before {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    content: "";
+    background-color: yellowgreen;
+    color: #000;
+}
+
+.project-header::after {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    margin-top: 99%;
+    content: "";
+    background-color: yellowgreen;
+} */
+
+.project-header {
+    background: linear-gradient(45deg, purple, blue, purple, red, orange);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
