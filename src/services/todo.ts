@@ -36,11 +36,10 @@ class TodoService {
 
     async patchTodo(id: number, newIsDoneStatus: number) {
         const patchURL: string = `/${id}`;
-        console.log({ patchURL, isDone: newIsDoneStatus });
-        console.log(JSON.stringify({ isDone: newIsDoneStatus }));
+        const stringfiedNewStatus = JSON.stringify({ isDone: newIsDoneStatus });
 
         try {
-            const response = await api.delete(patchURL,);
+            const response = await api.patch(patchURL, stringfiedNewStatus);
             return response.data;
         } catch (error) {
             console.error(error);
