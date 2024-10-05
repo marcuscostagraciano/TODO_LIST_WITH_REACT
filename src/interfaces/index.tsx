@@ -1,7 +1,8 @@
 interface Task {
   id: number;
   task_name: string;
-  isDone: boolean;
+  // API retorna '0' ou '1'
+  isDone: boolean | number;
 }
 
 interface Props {
