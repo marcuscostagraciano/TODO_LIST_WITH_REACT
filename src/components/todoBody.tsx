@@ -6,80 +6,80 @@ import { Task } from "../interfaces";
 import { TodoService } from "../services";
 
 const TODOBody = () => {
-  const [taskList, setTaskList] = useState<Task[]>([]);
-  const [task, setTask] = useState("");
+	const [taskList, setTaskList] = useState<Task[]>([]);
+	const [task_name, setTask] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const TodoListFromApi: Task[] = await TodoService.getTodoList();
-        setTaskList(TodoListFromApi);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const TodoListFromApi: Task[] = await TodoService.getTodoList();
+				setTaskList(TodoListFromApi);
+			} catch (error) {
+				console.log(error);
+			}
+		};
 
-    fetchData();
-  }, []);
+		fetchData();
+	}, []);
 
-  const handleOnChange = (e: BaseSyntheticEvent) => {
-    // Da própria documentação
-    // https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
-    setTask(e.target.value);
-  };
+	const handleOnChange = (e: BaseSyntheticEvent) => {
+		// Da própria documentação
+		// https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
+		setTask(e.target.value);
+	};
 
-  const handleButtonSubmit = async (e: BaseSyntheticEvent) => {
-    e.preventDefault();
+	const handleButtonSubmit = async (e: BaseSyntheticEvent) => {
+		e.preventDefault();
 
-    if (task) {
-      try {
-        const newTask: Task = await TodoService.postTodo(task);
-        setTaskList([
-          ...taskList,
-          {
-            ...newTask,
-          },
-        ]);
-        setTask("");
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
+		if (task_name) {
+			try {
+				const newTask = (await TodoService.postTodo(task_name)) as Task;
 
-  const handleTodoToggle = async (id: number) => {
-    try {
-      const updatedTaskList = taskList.map((task) =>
-        task.id === id ? { ...task, isDone: !task.isDone } : task
-      );
-      const updatedTask = updatedTaskList.find((task) => task.id === id);
+				setTaskList([
+					...taskList,
+					{
+						...newTask,
+					},
+				]);
+				setTask("");
+			} catch (error) {
+				console.log(error);
+			}
+		}
+	};
 
-      await TodoService.patchTodo(updatedTask!.id, updatedTask!.isDone);
-      setTaskList(updatedTaskList);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+	const handleTodoToggle = async (id: number) => {
+		try {
+			const updatedTaskList = [...taskList];
+			const updatedTask = updatedTaskList.find((task) => task.id === id);
+			updatedTask!.isDone = Number(!updatedTask!.isDone);
 
-  const handleTodoDeleteTask = async (id: number) => {
-    await TodoService.deleteTodo(id);
-    setTaskList(taskList.filter((task) => task.id !== id));
-  };
+			await TodoService.patchTodo(updatedTask!.id);
+			setTaskList(updatedTaskList);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
-  return (
-    <>
-      <Inputs
-        task={task}
-        onChange={handleOnChange}
-        onSubmit={handleButtonSubmit}
-      />
-      <TODOListing
-        tasks={taskList}
-        onClick={handleTodoToggle}
-        onDelete={handleTodoDeleteTask}
-      />
-    </>
-  );
+	const handleTodoDeleteTask = async (id: number) => {
+		await TodoService.deleteTodo(id);
+		setTaskList(taskList.filter((task) => task.id !== id));
+	};
+
+	return (
+		<>
+			<Inputs
+				task={task_name}
+				onChange={handleOnChange}
+				onSubmit={handleButtonSubmit}
+			/>
+			<TODOListing
+				tasks={taskList}
+				onClick={handleTodoToggle}
+				onDelete={handleTodoDeleteTask}
+			/>
+		</>
+	);
 };
 
 export default TODOBody;
