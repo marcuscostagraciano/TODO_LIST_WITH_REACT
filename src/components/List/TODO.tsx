@@ -17,8 +17,8 @@ const TODOListing = ({ tasks, onClick, onDelete }) => {
 
 const createTaskList = (
   taskList: Task[],
-  onClick: (id: string) => void,
-  onDelete: (id: string) => void
+  onClick: (id: number) => void,
+  onDelete: (id: number) => void
 ) =>
   taskList.map((task: Task) => (
     <li
@@ -29,7 +29,7 @@ const createTaskList = (
       <p
         style={liStyle}
         className={
-          "m-0" + (task.isDone === true ? " text-decoration-line-through" : "")
+          "m-0" + (task.isDone === 1 ? " text-decoration-line-through" : "")
         }
       >
         {task.task_name}
