@@ -34,12 +34,11 @@ class TodoService {
         }
     }
 
-    async patchTodo(id: number, newIsDoneStatus: number) {
+    async patchTodo(id: number) {
         const patchURL: string = `/${id}`;
-        const stringfiedNewStatus = JSON.stringify({ isDone: newIsDoneStatus });
 
         try {
-            const response = await api.patch(patchURL, stringfiedNewStatus);
+            const response = await api.patch(patchURL);
             return response.data;
         } catch (error) {
             console.error(error);
